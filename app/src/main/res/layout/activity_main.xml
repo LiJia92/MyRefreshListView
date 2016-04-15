@@ -21,4 +21,30 @@
         android:layout_below="@+id/seek_bar"
         android:layout_marginTop="16dp" />
 
+    <Button
+        android:id="@+id/play_animation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/first_view"
+        android:layout_marginTop="16dp"
+        android:text="播放动画" />
+
+    <com.android.lovesixgod.myrefreshlistview.RefreshSecondView
+        android:id="@+id/second_animation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/play_animation"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/pull_to_refresh_second_anim" />
+
+    <com.android.lovesixgod.myrefreshlistview.RefreshThirdView
+        android:id="@+id/third_animation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/play_animation"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@+id/second_animation"
+        android:background="@drawable/pull_to_refresh_third_anim" />
+
 </RelativeLayout>

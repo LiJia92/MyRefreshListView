@@ -1,13 +1,19 @@
 package com.android.lovesixgod.myrefreshlistview;
 
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
 
 public class MainActivity extends AppCompatActivity {
 
     private SeekBar seekBar;
     private RefreshFirstView firstView;
+    private Button play;
+    private RefreshSecondView secondAnim;
+    private RefreshThirdView thirdAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
         seekBar = (SeekBar) findViewById(R.id.seek_bar);
         firstView = (RefreshFirstView) findViewById(R.id.first_view);
+        play = (Button) findViewById(R.id.play_animation);
+        secondAnim = (RefreshSecondView) findViewById(R.id.second_animation);
+        thirdAnim = (RefreshThirdView) findViewById(R.id.third_animation);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -32,6 +41,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnimationDrawable second = (AnimationDrawable) secondAnim.getBackground();
+                second.start();
+                AnimationDrawable third = (AnimationDrawable) thirdAnim.getBackground();
+                third.start();
             }
         });
     }

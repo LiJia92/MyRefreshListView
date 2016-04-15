@@ -3,37 +3,33 @@ package com.android.lovesixgod.myrefreshlistview;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * 第一步View
+ * 第二步View
  * Created by Jaceli on 2016-04-15.
  */
-public class RefreshFirstView extends View {
+public class RefreshSecondView extends View {
 
-    private Bitmap firstBitmap;
     private Bitmap endBitmap;
-    private float mCurrentProgress;
 
-    public RefreshFirstView(Context context) {
+    public RefreshSecondView(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
-    public RefreshFirstView(Context context, AttributeSet attrs) {
+    public RefreshSecondView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
-    public RefreshFirstView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public RefreshSecondView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
-        firstBitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.pull_image));
+    private void init() {
         endBitmap = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.pull_end_image_frame_05));
     }
 
@@ -42,10 +38,10 @@ public class RefreshFirstView extends View {
         setMeasuredDimension(measureWidth(widthMeasureSpec), measureWidth(widthMeasureSpec) * endBitmap.getHeight() / endBitmap.getWidth());
     }
 
-    private int measureWidth(int widMeasureSpec) {
+    private int measureWidth(int widthMeasureSpec) {
         int result;
-        int size = MeasureSpec.getSize(widMeasureSpec);
-        int mode = MeasureSpec.getMode(widMeasureSpec);
+        int size = MeasureSpec.getSize(widthMeasureSpec);
+        int mode = MeasureSpec.getMode(widthMeasureSpec);
         if (mode == MeasureSpec.EXACTLY) {
             result = size;
         } else {
@@ -56,17 +52,4 @@ public class RefreshFirstView extends View {
         }
         return result;
     }
-
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        canvas.scale(mCurrentProgress, mCurrentProgress);
-        canvas.drawBitmap(firstBitmap, 0, 0, null);
-    }
-
-    public void setCurrentProgress(float currentProgress) {
-        this.mCurrentProgress = currentProgress;
-    }
-
 }
