@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Scroller;
 import android.widget.TextView;
 
 /**
@@ -29,6 +30,7 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
     private int state; // 当前的状态
     private boolean isRefreshable; // 是否可刷新
     private boolean isRecord; // 是否开始准备下拉刷新
+    private boolean refreshEnd; // 是否刷新结束
     private int mFirstVisibleItem; // 当前第一个可见Item
     private LinearLayout headerView; // 头布局
     private TextView refreshText; // 刷新文字说明
@@ -42,7 +44,7 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
     private float offsetY; // Y坐标上的偏移量
     private OnRefreshListener refreshListener; // 回调接口
     // 滑动类
-//    private Scroller mScroller = null;
+    private Scroller mScroller = null;
 
     public RefreshListView(Context context) {
         super(context);
@@ -73,7 +75,7 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
         setOverScrollMode(View.OVER_SCROLL_NEVER);
         setOnScrollListener(this);
 
-//        mScroller = new Scroller(context);
+        mScroller = new Scroller(context);
 
         headerView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.list_header, this, false);
         refreshText = (TextView) headerView.findViewById(R.id.pull_to_refresh);
@@ -93,17 +95,17 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
         isRecord = false;
     }
 
-//    @Override
-//    public void computeScroll() {
-//        if (mScroller.computeScrollOffset()) {
-//            setPaddingTop(mScroller.getCurrY());
-//        }
-//    }
-//
-//    private void setPaddingTop(int paddingTop) {
-//        headerView.setPadding(0, paddingTop, 0, 0);
-//        headerView.postInvalidate();
-//    }
+    @Override
+    public void computeScroll() {
+        if (mScroller.computeScrollOffset()) {
+            setPaddingTop(mScroller.getCurrY());
+        }
+    }
+
+    private void setPaddingTop(int paddingTop) {
+        headerView.setPadding(0, paddingTop, 0, 0);
+        headerView.postInvalidate();
+    }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -121,11 +123,9 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
             switch (ev.getAction()) {
                 //用户按下
                 case MotionEvent.ACTION_DOWN:
-                    //如果当前是在listview顶部并且没有记录y坐标
                     if (mFirstVisibleItem == 0 && !isRecord) {
                         //将isRecord置为true，说明现在已记录y坐标
                         isRecord = true;
-                        //将当前y坐标赋值给startY起始y坐标
                         startY = ev.getY();
                     }
                     break;
@@ -133,7 +133,7 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
                 case MotionEvent.ACTION_MOVE:
                     //再次得到y坐标，用来和startY相减来计算offsetY位移值
                     float tempY = ev.getY();
-                    //再起判断一下是否为listview顶部并且没有记录y坐标
+                    //再判断一次
                     if (mFirstVisibleItem == 0 && !isRecord) {
                         isRecord = true;
                         startY = tempY;
@@ -157,13 +157,11 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
                             if (-headerViewHeight + offsetY / RATIO < 0) {
                                 //将状态置为下拉刷新状态
                                 state = PULL_TO_REFRESH;
-                                //根据状态改变headerView，主要是更新动画和文字等信息
                                 changeHeaderByState(state);
                                 //如果当前y的位移值小于0，即为headerView隐藏了
                             } else if (offsetY <= 0) {
                                 //将状态变为done
                                 state = DONE;
-                                //根据状态改变headerView，主要是更新动画和文字等信息
                                 changeHeaderByState(state);
                             }
                         }
@@ -174,13 +172,11 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
                             if (-headerViewHeight + offsetY / RATIO >= 0) {
                                 //将状态变为放开刷新
                                 state = RELEASE_TO_REFRESH;
-                                //根据状态改变headerView，主要是更新动画和文字等信息
                                 changeHeaderByState(state);
                                 //如果当前y的位移值小于0，即为headerView隐藏了
                             } else if (offsetY <= 0) {
                                 //将状态变为done
                                 state = DONE;
-                                //根据状态改变headerView，主要是更新动画和文字等信息
                                 changeHeaderByState(state);
                             }
                         }
@@ -212,27 +208,27 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
                         }
                     }
                     break;
-                //当用户手指抬起时
-                case MotionEvent.ACTION_UP:
+                default:
                     //如果当前状态为下拉刷新状态
                     if (state == PULL_TO_REFRESH) {
                         //平滑的隐藏headerView
                         this.smoothScrollBy((int) (-headerViewHeight + offsetY / RATIO) + headerViewHeight, 500);
-                        //根据状态改变headerView
                         changeHeaderByState(state);
                     }
                     //如果当前状态为放开刷新
                     if (state == RELEASE_TO_REFRESH) {
                         //平滑的滑到正好显示headerView
-                        this.smoothScrollBy((int) (-headerViewHeight + offsetY / RATIO), 500);
+//                        this.smoothScrollBy((int) (-headerViewHeight + offsetY / RATIO), 500);
+                        mScroller.startScroll(0, (int) (-headerViewHeight + offsetY / RATIO), 0, (int) (headerViewHeight - offsetY / RATIO), 500);
                         //将当前状态设置为正在刷新
                         state = REFRESHING;
                         //回调接口的onRefresh方法
-                        refreshListener.onRefresh();
-                        //根据状态改变headerView
                         changeHeaderByState(state);
+                        if (refreshListener != null) {
+                            refreshListener.onRefresh();
+                        }
                     }
-                    //这一套手势执行完，一定别忘了将记录y坐标的isRecord改为false，以便于下一次手势的执行
+                    //一套操作执行完，重置状态
                     isRecord = false;
                     break;
             }
@@ -249,7 +245,12 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
     private void changeHeaderByState(int state) {
         switch (state) {
             case DONE:
-                headerView.setPadding(0, -headerViewHeight, 0, 0);
+                if (refreshEnd) { // 如果是刷新结束，则慢慢滚动消失
+                    mScroller.startScroll(0, 0, 0, -headerViewHeight, 500);
+                    refreshEnd = false;
+                } else {
+                    headerView.setPadding(0, -headerViewHeight, 0, 0);
+                }
                 firstView.setVisibility(VISIBLE);
                 secondView.setVisibility(GONE);
                 secondAnim.stop();
@@ -315,9 +316,8 @@ public class RefreshListView extends ListView implements ListView.OnScrollListen
      */
     public void setOnRefreshComplete() {
         state = DONE;
+        refreshEnd = true;
         changeHeaderByState(state);
-
-//        mScroller.startScroll(0, 0, 0, -headerViewHeight, 500);
     }
 
     /**
