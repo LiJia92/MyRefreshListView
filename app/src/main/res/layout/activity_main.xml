@@ -47,4 +47,12 @@
         android:layout_toRightOf="@+id/second_animation"
         android:background="@drawable/pull_to_refresh_third_anim" />
 
+    <Button
+        android:id="@+id/go_to_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/third_animation"
+        android:layout_marginTop="16dp"
+        android:text="列表" />
+
 </RelativeLayout>

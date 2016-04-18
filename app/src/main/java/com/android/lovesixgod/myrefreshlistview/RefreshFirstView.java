@@ -16,6 +16,9 @@ public class RefreshFirstView extends View {
     private Bitmap firstBitmap;
     private Bitmap endBitmap;
     private float mCurrentProgress;
+    private int measuredWidth;
+    private int measuredHeight;
+    private Bitmap scaledBitmap;
 
     public RefreshFirstView(Context context) {
         super(context);
@@ -42,6 +45,16 @@ public class RefreshFirstView extends View {
         setMeasuredDimension(measureWidth(widthMeasureSpec), measureWidth(widthMeasureSpec) * endBitmap.getHeight() / endBitmap.getWidth());
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right,
+                            int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        measuredWidth = getMeasuredWidth();
+        measuredHeight = getMeasuredHeight();
+        //根据第二阶段娃娃宽高  给椭圆形图片进行等比例的缩放
+        scaledBitmap = Bitmap.createScaledBitmap(firstBitmap, measuredWidth, measuredWidth * firstBitmap.getHeight() / firstBitmap.getWidth(), true);
+    }
+
     private int measureWidth(int widMeasureSpec) {
         int result;
         int size = MeasureSpec.getSize(widMeasureSpec);
@@ -61,8 +74,9 @@ public class RefreshFirstView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.scale(mCurrentProgress, mCurrentProgress);
-        canvas.drawBitmap(firstBitmap, 0, 0, null);
+        // 通过画布缩放，控制View缩放
+        canvas.scale(mCurrentProgress, mCurrentProgress, measuredWidth / 2, measuredHeight / 2);
+        canvas.drawBitmap(scaledBitmap, 0, measuredHeight / 4, null);
     }
 
     public void setCurrentProgress(float currentProgress) {

@@ -1,5 +1,6 @@
 package com.android.lovesixgod.myrefreshlistview;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private Button play;
     private RefreshSecondView secondAnim;
     private RefreshThirdView thirdAnim;
+    private Button toList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seek_bar);
         firstView = (RefreshFirstView) findViewById(R.id.first_view);
         play = (Button) findViewById(R.id.play_animation);
+        toList = (Button) findViewById(R.id.go_to_list);
         secondAnim = (RefreshSecondView) findViewById(R.id.second_animation);
         thirdAnim = (RefreshThirdView) findViewById(R.id.third_animation);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -51,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
                 second.start();
                 AnimationDrawable third = (AnimationDrawable) thirdAnim.getBackground();
                 third.start();
+            }
+        });
+
+        toList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                startActivity(intent);
             }
         });
     }
